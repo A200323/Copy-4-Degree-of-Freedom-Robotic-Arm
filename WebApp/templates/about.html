@@ -3,19 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Simple Page</title>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-light: #f9fafb;
-            --white: #ffffff;
-            --border: #e5e7eb;
-        }
-
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -23,225 +13,93 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            background-color: var(--bg-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-        }
-
-        /* Navigation */
-        nav {
+            color: #333;
+            background-color: #f4f7f6;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border);
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .logo {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--primary);
-        }
-
-        /* Hero Section */
-        .hero {
+        /* Header Styles */
+        header {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 1.5rem 2rem;
             text-align: center;
-            padding: 5rem 1rem 3rem;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
             max-width: 800px;
-            margin: 0 auto;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
         }
 
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: -0.025em;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-        }
-
-        /* Main Content Grid */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem 1rem 5rem;
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-            background: var(--white);
-            padding: 3rem;
-            border-radius: 1rem;
-            border: 1px solid var(--border);
-            margin-bottom: 4rem;
-        }
-
-        .about-text h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
-
-        .about-text p {
-            color: var(--text-muted);
+        .card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             margin-bottom: 1.5rem;
         }
 
-        .about-image img {
-            width: 100%;
-            height: auto;
-            border-radius: 0.75rem;
-            object-fit: cover;
+        .card h2 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
         }
 
-        /* Values Section */
-        .values-section {
-            text-align: center;
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
         }
 
-        .values-section h2 {
-            font-size: 2.25rem;
-            margin-bottom: 3rem;
+        .btn:hover {
+            background-color: #2980b9;
         }
 
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .value-card {
-            background: var(--white);
-            padding: 2.5rem 2rem;
-            border-radius: 1rem;
-            border: 1px solid var(--border);
-            text-align: left;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .value-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        .value-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: var(--primary);
-        }
-
-        .value-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        /* Footer */
+        /* Footer Styles */
         footer {
+            background-color: #2c3e50;
+            color: #ffffff;
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid var(--border);
-            background-color: var(--white);
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .about-grid {
-                grid-template-columns: 1fr;
-                padding: 1.5rem;
-            }
-            .hero h1 {
-                font-size: 2.25rem;
-            }
+            padding: 1rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="#" class="logo">BrandName</a>
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#" class="active">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-    </nav>
+    <header>
+        <h1>Welcome to My Website</h1>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>We're on a mission to build better experiences.</h1>
-        <p>Passionate creators, innovators, and problem-solvers dedicated to delivering excellence.</p>
-    </section>
+    <main>
+        <section class="card">
+            <h2>Hello, HELP!!!!!</h2>
+            <p>This is a simple, modern HTML and CSS template. It includes a responsive layout, a clean card design, and a custom styled button.</p>
+            <a href="https://imgs.search.brave.com/kdUbv30TY_1dOipsMZMn2lZNq-TJWl_n0liu3kl1j7w/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAyMS8x/Mi8xNS8wMi8zOC9j/b3B5cmlnaHQtNjg3/MTY3Nl82NDAucG5n">
+            <button type="button">Click Me!</button> </a>
+        </section>
+    </main>
 
-    <!-- Main Content Container -->
-    <div class="container">
-        
-        <!-- Story / Intro Grid -->
-        <div class="about-grid">
-            <div class="about-text">
-                <h2>Who We Are</h2>
-                <p>Founded with a simple vision, our team brings together diverse talents from design, engineering, and strategy. We believe in crafting intuitive, scalable, and impactful solutions that help people achieve more.</p>
-                <p>Every line of code and every design choice is driven by our commitment to quality and user-centric philosophy.</p>
-            </div>
-            <div class="about-image">
-                <!-- Placeholder Image -->
-                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Team collaborating">
-            </div>
-        </div>
-
-        <!-- Values Section -->
-        <div class="values-section">
-            <h2>Our Core Values</h2>
-            <div class="values-grid">
-                <div class="value-card">
-                    <h3>Innovation First</h3>
-                    <p>We constantly challenge the status quo, exploring new ideas and modern technologies to stay ahead of the curve.</p>
-                </div>
-                <div class="value-card">
-                    <h3>Uncompromising Quality</h3>
-                    <p>We pay attention to the smallest details, ensuring robust, reliable, and polished execution in everything we build.</p>
-                </div>
-                <div class="value-card">
-                    <h3>User-Centric</h3>
-                    <p>Our audience is at the heart of our decisions. We build solutions designed to make real, meaningful differences.</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 BrandName. All rights reserved.</p>
+        <p>&copy; 2026 Simple Page. All rights reserved.</p>
     </footer>
 
 </body>
