@@ -1,0 +1,26 @@
+{
+  "buttons": {
+    "0": { "name": "Cross (X)", "action": "jump" },
+    "1": { "name": "Circle", "action": "crouch" },
+    "2": { "name": "Square", "action": "reload" },
+    "3": { "name": "Triangle", "action": "interact" },
+    "4": { "name": "L1 (Left Bumper)", "action": "prev_weapon" },
+    "5": { "name": "R1 (Right Bumper)", "action": "next_weapon" },
+    "6": { "name": "L2 (Left Trigger)", "action": "aim" },
+    "7": { "name": "R2 (Right Trigger)", "action": "fire" },
+    "8": { "name": "Share", "action": "open_menu" },
+    "9": { "name": "Options", "action": "pause_game" },
+    "10": { "name": "L3 (Left Stick Click)", "action": "sprint" },
+    "11": { "name": "R3 (Right Stick Click)", "action": "melee" },
+    "12": { "name": "D-Pad Up", "action": "menu_up" },
+    "13": { "name": "D-Pad Down", "action": "menu_down" },
+    "14": { "name": "D-Pad Left", "action": "menu_left" },
+    "15": { "name": "D-Pad Right", "action": "menu_right" }
+  },
+  "axes": {
+    "0": { "name": "Left Stick X", "action": "move_horizontal" },
+    "1": { "name": "Left Stick Y", "action": "move_vertical" },
+    "2": { "name": "Right Stick X", "action": "look_horizontal" },
+    "3": { "name": "Right Stick Y", "action": "look_vertical" }
+  }
+}
