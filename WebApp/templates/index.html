@@ -3,104 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Page</title>
+    <title>ESP32-Cam Robot Controller</title>
     <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f4f7f6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: #2c3e50;
-            color: #ffffff;
-            padding: 1.5rem 2rem;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 1.8rem;
-        }
-
-        /* Main Content Container */
-        main {
-            flex: 1;
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
-
-        .card {
-            background: #ffffff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 1.5rem;
-        }
-
-        .card h2 {
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1rem;
-            margin-top: 1rem;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        /* Footer Styles */
-        footer {
-            background-color: #2c3e50;
-            color: #ffffff;
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.9rem;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #222; color: #fff; margin: 0; padding: 20px; }
+        h1 { color: #4CAF50; }
+        .stream-container { margin: 20px auto; max-width: 640px; border: 3px solid #4CAF50; border-radius: 8px; overflow: hidden; background: #000; }
+        img { width: 100%; height: auto; display: block; }
+        .control-grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; margin-top: 20px; }
+        button { padding: 20px; font-size: 16px; font-weight: bold; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #45a049; }
+        button:active { background-color: #3e8e41; }
+        .empty { background: transparent; border: none; cursor: default; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
+    <h1>ESP32-Cam & Arduino Robot Dashboard</h1>
+    
+    <!-- Live Video Feed from ESP32-Cam Stream Server -->
+    <div class="stream-container">
+        <img src="{{ stream_url }}" alt="ESP32 Live Stream">
+    </div>
 
-    <main>
-        <section class="card">
-            <h2>Hello, {{name}}!</h2>
-            <p>This is a simple, modern HTML and CSS template. It includes a responsive layout, a clean card design, and a custom styled button.</p>
-            <a href="http://127.0.0.1:5000/team">
-            <button type="button">Click Me!</button> </a>
-        </section>
-    </main>
+    <!-- Control Pad -->
+    <div class="control-grid">
+        <div class="empty"></div>
+        <button onclick="sendCommand('forward')">FORWARD</button>
+        <div class="empty"></div>
+        
+        <button onclick="sendCommand('left')">LEFT</button>
+        <button onclick="sendCommand('stop')">STOP</button>
+        <button onclick="sendCommand('right')">RIGHT</button>
+        
+        <div class="empty"></div>
+        <button onclick="sendCommand('backward')">BACKWARD</button>
+        <div class="empty"></div>
+    </div>
+    
+    <h1>DS4 Controller Connected</h1>
+    <p id="output">Waiting for input...</p>
 
-    <footer>
-        <p>&copy; 2026 Simple Page. All rights reserved.</p>
-    </footer>
+    <script>
+        let gamepadIndex = null;
+        let config = { buttons: {}, axes: {} };
 
+        // Load the JSON configuration
+        fetch('/static/gamepad_config.json')
+            .then(response => response.json())
+            .then(data => {
+                config = data;
+                document.getElementById("output").innerText = "Config loaded. Move your DS4 controller!";
+            })
+            .catch(error => console.error("Error loading config:", error));
+
+        window.addEventListener("gamepadconnected", (event) => {
+            gamepadIndex = event.gamepad.index;
+            console.log(`Connected: ${event.gamepad.id}`);
+        });
+
+        window.addEventListener("gamepaddisconnected", () => {
+            gamepadIndex = null;
+            document.getElementById("output").innerText = "Controller disconnected.";
+        });
+
+        let previousButtonStates = {};
+        const DEADZONE = 0.2; // Prevents analog stick drift
+
+        function pollGamepad() {
+            if (gamepadIndex !== null && Object.keys(config.buttons).length > 0) {
+                const gamepad = navigator.getGamepads()[gamepadIndex];
+                
+                if (gamepad) {
+                    // 1. Process Digital Buttons (Shapes, D-Pad, Bumpers, Triggers as buttons, L3/R3)
+                    gamepad.buttons.forEach((button, index) => {
+                        const isPressed = button.pressed;
+                        const wasPressed = previousButtonStates[index] || false;
+
+                        if (config.buttons[index]) {
+                            const btnConfig = config.buttons[index];
+
+                            // Trigger only on initial press down
+                            if (isPressed && !wasPressed) {
+                                displayAction(btnConfig.name, btnConfig.action, button.value);
+                            }
+                        }
+                        previousButtonStates[index] = isPressed;
+                    });
+
+                    // 2. Process Analog Thumbsticks (Axes)
+                    gamepad.axes.forEach((axisValue, index) => {
+                        if (config.axes[index]) {
+                            const axisConfig = config.axes[index];
+
+                            // Only register movement if it passes the deadzone threshold
+                            if (Math.abs(axisValue) > DEADZONE) {
+                                // You can stream continuous values here (e.g., movement speed)
+                                console.log(`${axisConfig.name} value: ${axisValue.toFixed(2)}`);
+                            }
+                        }
+                    });
+                }
+            }
+            requestAnimationFrame(pollGamepad);
+        }
+
+        function displayAction(name, action, value) {
+            console.log(`Action: ${action} (${name})`);
+            document.getElementById("output").innerText = `Pressed: ${name} -> Action: ${action}`;
+            
+            // Send to Flask back-end if needed
+            fetch('/gamepad-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, value: value })
+            }).catch(err => console.error("Flask error:", err));
+        }
+
+        function sendCommand(action) {
+            fetch('/send_command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error sending command:', error);
+            });
+        }
+    
+        // Start the polling loop
+        requestAnimationFrame(pollGamepad);
+        </script>
 </body>
 </html>
