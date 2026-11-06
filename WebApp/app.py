@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-# from telemetrix import telemetrix
 from utils.myTelemetrix import MyTelemetrix
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QVBoxLayout
@@ -8,9 +7,7 @@ from PySide6.QtCore import QFile, QIODevice, QUrl
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 STREAM_URL = "http://192.168.254.123:81/stream"
-PORT_NAME = "/dev/rfcomm0"
-# EDITOR'S NOTE: '/dev/rfcomm0' is a virtual port for Arjay's Nobara OS (Linux Fedora Distro)
-# For anyone testing this, please change this variable!
+PORT_NAME = "/dev/rfcomm3"
 
 class MyApp:
     def __init__(self, telemetrixObject):
@@ -25,9 +22,6 @@ class MyApp:
 
         self.board = telemetrixObject
 
-        # INIT Hardware
-        self.board.update_led_intensity(49)
-
         # INIT Widget Functions
         # Webview
         self.web_view = QWebEngineView()
@@ -37,44 +31,46 @@ class MyApp:
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.web_view)
 
-        # LEFT or RIGHT Slider
-        # self.window.turnSlider.valueChanged.connect(self.on_value_changedT)
+        # Ensure sliders start at default 49 if not set in .ui
+        self.window.forwardSlider.setValue(49)
+        self.window.turnSlider.setValue(49)
+
+        # SLIDER SIGNALS & UI LOGIC
+        # LEFT or RIGHT Slider bindings
+        self.window.turnSlider.valueChanged.connect(self.on_turn_changed)
         self.window.turnSlider.sliderReleased.connect(self.reset_to_neutralT)
 
-        # FORWARD or BACKWARD Slider
+        # FORWARD or BACKWARD Slider bindings
+        self.window.forwardSlider.valueChanged.connect(self.on_forward_changed)
         self.window.forwardSlider.sliderReleased.connect(self.reset_to_neutralF)
-
-        # SLIDERS Setup
-        for slider in [self.window.forwardSlider, self.window.turnSlider]:
-            slider.valueChanged.connect(self.board.update_motors)
 
         # Reconnect Panel
         self.window.reconnBtn.clicked.connect(lambda: self.board.reconn(self.window.portNameEdit.text()))
 
+        # Initial stop state
+        self.board.update_motors(self.window.forwardSlider, self.window.turnSlider)
+
     def show(self):
         self.window.show()
 
-    # UI LOGIC
-    # LEFT or RIGHT Logics
-    def on_value_changedT(self, value):
-        # Calculate offset from center (49)
-        # Negative = Left/Backward, Positive = Right/Forward
+    # UI LOGIC & HARDWARE TRIGGER
+    def on_turn_changed(self, value):
         offset = value - 49
         self.window.turnStatus.setText(f"Slider Value: {value} | Command Offset: {offset:+d}")
+        # Send current states of both sliders to telemetrix
+        self.board.update_motors(self.window.forwardSlider, self.window.turnSlider)
+
     def reset_to_neutralT(self):
-        # Instantly snap back to 49 on release
         self.window.turnSlider.setValue(49)
 
-    # FORWARD or BACKWARD Logics
-    def on_value_changedF(self, value):
-        # Calculate offset from center (49)
-        # Negative = Left/Backward, Positive = Right/Forward
+    def on_forward_changed(self, value):
         offset = value - 49
         self.window.forwardStatus.setText(f"Slider Value: {value} | Command Offset: {offset:+d}")
-    def reset_to_neutralF(self):
-        # Instantly snap back to 49 on release
-        self.window.forwardSlider.setValue(49)
+        # Send current states of both sliders to telemetrix
+        self.board.update_motors(self.window.forwardSlider, self.window.turnSlider)
 
+    def reset_to_neutralF(self):
+        self.window.forwardSlider.setValue(49)
 
 
 if __name__ == '__main__':

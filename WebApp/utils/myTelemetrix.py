@@ -48,14 +48,11 @@ class MyTelemetrix:
         except AttributeError as aR:
             print(aR, "\nNo Board to shutdown, closing anyway...")
 
-    # INSTRUCTIONS
-
-
-    # TESTING Script
-    def update_motors(self, FSlider, TSlider):
+    # MOTOR INSTRUCTIONS
+    def update_motors(self, forwardSlider, turnSlider):
         """Processes sliders with exclusive priority for straight motion vs turning at full speed."""
-        fwd_raw = FSlider.value()
-        trn_raw = TSlider.value()
+        fwd_raw = forwardSlider.value()
+        trn_raw = turnSlider.value()
         
         # Calculate deviation from neutral center (49)
         fwd_intent = fwd_raw - 49
