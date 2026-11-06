@@ -1,46 +1,47 @@
-from flask import Flask, render_template, request, jsonify
-import requests
+import sys
+from pathlib import Path
+# from telemetrix import telemetrix
+from utils.myTelemetrix import MyTelemetrix
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QFile, QIODevice
 
-app = Flask(__name__)
 
-# ESP32-Cam Access Point IP address
-ESP32_IP = "192.168.4.1"
+class MyApp:
+    def __init__(self):
+        script_dir = Path(__file__).resolve().parent
+        ui_path = script_dir / "app.ui"
 
-@app.route('/')
-def index():
-    # Pass the ESP32 streaming URL to the HTML template
-    # Note: Stream runs on port 81 by default in this architecture
-    stream_url = f"http://{ESP32_IP}:81/stream"
-    return render_template('index.html', stream_url=stream_url)
+        ui_file = QFile(str(ui_path))
+        ui_file.open(QIODevice.ReadOnly)
+        loader = QUiLoader()
+        self.window = loader.load(ui_file)
+        ui_file.close()
 
-@app.route('/gamepad-action', methods=['POST'])
-def gamepad_action():
-    data = request.json
-    print(f"Received from gamepad: {data}")
-    print(f"Action: {data['action']}")
-    return jsonify({"status": "success"})
+        # INIT Widget Functions
+        self.window.turnSlider.valueChanged.connect(self.on_value_changed)
+        self.window.turnSlider.sliderReleased.connect(self.reset_to_neutral)
 
-@app.route('/send_command', methods=['POST'])
-def send_command():
-    data = request.get_json()
-    action = data.get('action') # e.g., "forward", "left", "stop"
-    
-    if not action:
-        return jsonify({"status": "error", "message": "No action provided"}), 400
 
-    try:
-        # Forward command to the ESP32-Cam control endpoint using the modified app_httpd.cpp logic
-        control_url = f"http://{ESP32_IP}/control?var=move&val={action}"
-        response = requests.get(control_url, timeout=2.0)
-        
-        if response.status_code == 200:
-            return jsonify({"status": "success", "action": action})
-        else:
-            return jsonify({"status": "error", "message": "ESP32-Cam rejected command"}), 500
-            
-    except requests.exceptions.RequestException as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    def show(self):
+        self.window.show()
+
+    # UI LOGIC
+    def on_value_changed(self, value):
+        # Calculate offset from center (49)
+        # Negative = Left/Backward, Positive = Right/Forward
+        offset = value - 49
+        self.window.turnStatus.setText(f"Slider Value: {value} | Command Offset: {offset:+d}")
+
+    def reset_to_neutral(self):
+        # Instantly snap back to 49 on release
+        self.slider.setValue(49)
+
 
 if __name__ == '__main__':
-    # Run Flask app locally on port 5000
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app = QApplication(sys.argv)
+    conn_tele = MyTelemetrix()
+    tele_app = MyApp()
+    tele_app.show()
+    app.aboutToQuit.connect(conn_tele.close)
+    sys.exit(app.exec())
