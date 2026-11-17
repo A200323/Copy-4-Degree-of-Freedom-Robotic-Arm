@@ -6,14 +6,10 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout
 from PySide6.QtCore import QFile, QIODevice, QUrl
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
-STREAM_URL = "http://192.168.4.1:81/stream"
-PORT_NAME = "COM11"
-
-# Define PCA9685 Servo Channels
-SERVO0 = 0
-SERVO1 = 1
-SERVO2 = 2
-SERVO3 = 3 
+STREAM_URL = "http://192.168.254.123:81/stream"
+PORT_NAME = "COM4"
+# EDITOR'S NOTE: '/dev/rfcomm0' is a virtual port for Arjay's Nobara OS (Linux Fedora Distro)
+# For anyone testing this, please change this variable!
 
 class MyApp:
     def __init__(self, telemetrixObject):

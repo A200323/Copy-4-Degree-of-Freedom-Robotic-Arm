@@ -20,7 +20,7 @@ ESP32_IP = "192.168.254.123"
 @app.route('/')
 def index():
     stream_url = f"http://{ESP32_IP}:81/stream"
-    return render_template('index.html', stream_url=stream_url)
+    return render_template('index2.html', stream_url=stream_url)
 
 
 @app.route('/gamepad-action', methods=['POST'])
