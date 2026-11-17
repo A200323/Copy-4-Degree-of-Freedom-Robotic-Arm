@@ -242,7 +242,7 @@
 
     <form class="port" id="port-form">
       <div class="port-row">
-        <input id="com-port" aria-label="Bluetooth COM port"
+        <input id="com-port" aria-label="Bluetooth COM port" readonly
                placeholder="Bluetooth COM port" autocomplete="off"
                pattern="[Cc][Oo][Mm][1-9][0-9]*" title="Example: COM5" required>
         <button class="confirm" aria-label="Save COM port">✓</button>
@@ -257,13 +257,13 @@
           <button type="button" data-joint="arm" aria-pressed="true"
                   title="Select arm. U raises it and J lowers it.">ARM</button>
           <input type="range" id="arm" aria-label="Arm" aria-orientation="vertical"
-                 min="0" max="100" step="1" value="50">
+                 min="0" max="100" step="5" value="50">
         </div>
         <div class="joint">
           <button type="button" data-joint="elbow" aria-pressed="false"
                   title="Press I to raise the elbow and K to lower it.">ELBOW</button>
           <input type="range" id="elbow" aria-label="Elbow" aria-orientation="vertical"
-                 min="0" max="100" step="1" value="50">
+                 min="0" max="100" step="5" value="50">
         </div>
       </div>
 
@@ -301,7 +301,7 @@
         if (!response.ok) throw new Error("Command rejected");
         byId("notice").textContent = "";
       }).catch(() => {
-        byId("notice").textContent = "Flask could not receive the control. Check that web.py is running.";
+        byId("notice").textContent = "Flask could not receive the control. Check that web2.py is running.";
       });
     }
 

@@ -14,7 +14,7 @@ robot = RobotInterface()
 
 # Change this to the ESP32-CAM address shown in your Arduino Serial Monitor.
 # For access-point mode your template uses: ESP32_IP = "192.168.4.1"
-ESP32_IP = "192.168.254.123"
+ESP32_IP = "192.168.4.1"
 
 
 @app.route('/')
@@ -72,7 +72,7 @@ def status():
 
 
 def validate_command(data):
-    """Check browser input before passing it to the robot interface."""
+    """ Check browser input before passing it to the robot interface."""
     if not isinstance(data, dict):
         raise ValueError('The command must be a JSON object.')
     result = {}
